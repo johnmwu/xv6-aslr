@@ -21,6 +21,9 @@ exec(char *path, char **argv)
   pagetable_t pagetable = 0, oldpagetable;
   struct proc *p = myproc();
 
+  // int do_aslr;
+  uint64 prog_aslr; 
+
   begin_op(ROOTDEV);
 
   if((ip = namei(path)) == 0){
@@ -34,9 +37,13 @@ exec(char *path, char **argv)
     goto bad;
   if(elf.magic != ELF_MAGIC)
     goto bad;
+  // do_aslr = 1;
 
   if((pagetable = proc_pagetable(p)) == 0)
     goto bad;
+
+  // Compute address space randomizations
+  prog_aslr = 0x1000;
 
   // Load program into memory.
   sz = 0;
@@ -49,11 +56,11 @@ exec(char *path, char **argv)
       goto bad;
     if(ph.vaddr + ph.memsz < ph.vaddr)
       goto bad;
-    if((sz = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz)) == 0)
+    if((sz = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz + prog_aslr)) == 0)
       goto bad;
     if(ph.vaddr % PGSIZE != 0)
       goto bad;
-    if(loadseg(pagetable, ph.vaddr, ip, ph.off, ph.filesz) < 0)
+    if(loadseg(pagetable, ph.vaddr+prog_aslr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
   iunlockput(ip);
@@ -109,7 +116,7 @@ exec(char *path, char **argv)
   oldpagetable = p->pagetable;
   p->pagetable = pagetable;
   p->sz = sz;
-  p->tf->epc = elf.entry;  // initial program counter = main
+  p->tf->epc = elf.entry + prog_aslr;  // initial program counter = main
   p->tf->sp = sp; // initial stack pointer
   proc_freepagetable(oldpagetable, oldsz);
   return argc; // this ends up in a0, the first argument to main(argc, argv)
