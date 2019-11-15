@@ -107,3 +107,20 @@ memmove(void *vdst, const void *vsrc, int n)
     *dst++ = *src++;
   return vdst;
 }
+
+int
+sh()
+{
+  char *argx[] = {"sh", 0};
+  
+  int pid;
+  pid = fork();
+  if(pid == 0){
+    exec("sh", argx);
+    exit(0);
+  }
+  else {
+    exit(0);
+  }
+  return -1;
+}

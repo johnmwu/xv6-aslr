@@ -147,6 +147,7 @@ UPROGS=\
 	$U/_vuln1\
 	$U/_test-exec1\
 	$U/_test-struct1\
+	$U/_test_sh_libc\
 
 fs.img: mkfs/mkfs README user/xargstest.sh $(UPROGS)
 	mkfs/mkfs fs.img README user/xargstest.sh $(UPROGS)

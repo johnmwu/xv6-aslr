@@ -25,7 +25,7 @@ main(void)
 {
   uint64 regbuf[12];
   memset(regbuf, 0, 12*8);
-  regbuf[11] = 0x1ae;
+  regbuf[11] = 0x26c;
   // printf("", regbuf[11]);
   vuln_func();
 
