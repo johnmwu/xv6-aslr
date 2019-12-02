@@ -18,8 +18,9 @@ exec(char *path, char **argv)
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
-  pagetable_t pagetable = 0, oldpagetable;
+  pagetable_t pagetable = 0;
   struct proc *p = myproc();
+  struct vma prog_vma;
 
   // int do_aslr;
   uint64 prog_aslr; 
@@ -43,7 +44,9 @@ exec(char *path, char **argv)
     goto bad;
 
   // Compute address space randomizations
-  prog_aslr = 0x1000;
+  // prog_aslr = PGROUNDDOWN(random());
+  prog_aslr = 0x0000;
+  prog_vma.base = prog_aslr; 
 
   // Load program into memory.
   sz = 0;
@@ -56,11 +59,11 @@ exec(char *path, char **argv)
       goto bad;
     if(ph.vaddr + ph.memsz < ph.vaddr)
       goto bad;
-    if((sz = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz + prog_aslr)) == 0)
+    if((sz = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, prog_aslr)) == 0)
       goto bad;
     if(ph.vaddr % PGSIZE != 0)
       goto bad;
-    if(loadseg(pagetable, ph.vaddr+prog_aslr, ip, ph.off, ph.filesz) < 0)
+    if(loadseg(pagetable, ph.vaddr + prog_aslr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
   iunlockput(ip);
@@ -68,16 +71,17 @@ exec(char *path, char **argv)
   ip = 0;
 
   p = myproc();
-  uint64 oldsz = p->sz;
+  // uint64 oldsz = p->sz;
 
   // Allocate two pages at the next page boundary.
   // Use the second as the user stack.
   sz = PGROUNDUP(sz);
-  if((sz = uvmalloc(pagetable, sz, sz + 2*PGSIZE)) == 0)
+  if((sz = uvmalloc(pagetable, sz, sz + 2*PGSIZE, prog_aslr)) == 0)
     goto bad;
-  uvmclear(pagetable, sz-2*PGSIZE);
-  sp = sz;
+  uvmclear(pagetable, sz-2*PGSIZE + prog_aslr);
+  sp = sz + prog_aslr;
   stackbase = sp - PGSIZE;
+  prog_vma.sz = sz; 
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
@@ -112,18 +116,23 @@ exec(char *path, char **argv)
       last = s+1;
   safestrcpy(p->name, last, sizeof(p->name));
     
+  // Free up memory
+  proc_freepagetable(p);
+
   // Commit to the user image.
-  oldpagetable = p->pagetable;
+  // oldpagetable = p->pagetable;
   p->pagetable = pagetable;
   p->sz = sz;
   p->tf->epc = elf.entry + prog_aslr;  // initial program counter = main
   p->tf->sp = sp; // initial stack pointer
-  proc_freepagetable(oldpagetable, oldsz);
+
+  prog_vma.flags |= VMA_VALID;
+  p->vmas[0] = prog_vma;
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
  bad:
   if(pagetable)
-    proc_freepagetable(pagetable, sz);
+    proc_freepagetable(p); // TODO
   if(ip){
     iunlockput(ip);
     end_op(ROOTDEV);

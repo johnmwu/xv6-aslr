@@ -136,7 +136,7 @@ freeproc(struct proc *p)
     kfree((void*)p->tf);
   p->tf = 0;
   if(p->pagetable)
-    proc_freepagetable(p->pagetable, p->sz);
+    proc_freepagetable(p);
   p->pagetable = 0;
   p->sz = 0;
   p->pid = 0;
@@ -175,12 +175,18 @@ proc_pagetable(struct proc *p)
 // Free a process's page table, and free the
 // physical memory it refers to.
 void
-proc_freepagetable(pagetable_t pagetable, uint64 sz)
+proc_freepagetable(struct proc *p)
 {
-  uvmunmap(pagetable, TRAMPOLINE, PGSIZE, 0);
-  uvmunmap(pagetable, TRAPFRAME, PGSIZE, 0);
-  if(sz > 0)
-    uvmfree(pagetable, sz);
+  int vma_idx;
+
+  uvmunmap(p->pagetable, TRAMPOLINE, PGSIZE, 0);
+  uvmunmap(p->pagetable, TRAPFRAME, PGSIZE, 0);
+
+  for(vma_idx=0; vma_idx<NVMA; vma_idx++){
+    if(p->vmas[vma_idx].flags & VMA_VALID){
+      uvmfree(p->pagetable, p->vmas[vma_idx].sz, p->vmas[vma_idx].base);
+    }
+  }
 }
 
 // a user program that calls exec("/init")
@@ -206,8 +212,12 @@ userinit(void)
   
   // allocate one user page and copy init's instructions
   // and data into it.
+  // for now, now aslr in the init process
   uvminit(p->pagetable, initcode, sizeof(initcode));
   p->sz = PGSIZE;
+  p->vmas[0].flags |= VMA_VALID;
+  p->vmas[0].base = 0;
+  p->vmas[0].sz = 0x1000;
 
   // prepare for the very first "return" from kernel to user.
   p->tf->epc = 0;      // user program counter
@@ -228,18 +238,19 @@ growproc(int n)
 {
   uint sz;
   struct proc *p = myproc();
+  struct vma *heap_vma = &p->vmas[0]; // to change
 
-  sz = p->sz;
+  sz = heap_vma->sz; 
   if(n > 0){
-    if((sz = uvmalloc(p->pagetable, sz, sz + n)) == 0) {
+    if((sz = uvmalloc(p->pagetable, sz, sz + n, heap_vma->base)) == 0) {
       return -1;
     }
   } else if(n < 0){
-    if((sz = uvmdealloc(p->pagetable, sz, sz + n)) == 0) {
+    if((sz = uvmdealloc(p->pagetable, sz, sz + n, heap_vma->base)) == 0) {
       return -1;
     }
   }
-  p->sz = sz;
+  heap_vma->sz = sz;
   return 0;
 }
 
@@ -266,6 +277,9 @@ fork(void)
   np->sz = p->sz;
 
   np->parent = p;
+
+  // copy vmas
+  memmove(np->vmas, p->vmas, NVMA*sizeof(struct vma));
 
   // copy saved user registers.
   *(np->tf) = *(p->tf);

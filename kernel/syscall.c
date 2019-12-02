@@ -11,9 +11,17 @@
 int
 fetchaddr(uint64 addr, uint64 *ip)
 {
+  uint64 vma_addr;
+  int vma_idx;
   struct proc *p = myproc();
-  if(addr >= p->sz || addr+sizeof(uint64) > p->sz)
-    return -1;
+
+  for(vma_idx=0; vma_idx<NVMA; vma_idx++)
+    if(p->vmas[vma_idx].flags & VMA_VALID
+       && (vma_addr = p->vmas[vma_idx].base) <= addr
+       && vma_addr + p->vmas[vma_idx].sz >= addr+sizeof(uint64))
+      break;
+  if(vma_idx == NVMA)
+    return -1; 
   if(copyin(p->pagetable, (char *)ip, addr, sizeof(*ip)) != 0)
     return -1;
   return 0;

@@ -233,7 +233,7 @@ uvminit(pagetable_t pagetable, uchar *src, uint sz)
 // Allocate PTEs and physical memory to grow process from oldsz to
 // newsz, which need not be page aligned.  Returns new size or 0 on error.
 uint64
-uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz)
+uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz, uint64 base)
 {
   char *mem;
   uint64 a;
@@ -242,17 +242,17 @@ uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz)
     return oldsz;
 
   oldsz = PGROUNDUP(oldsz);
-  a = oldsz;
-  for(; a < newsz; a += PGSIZE){
+  a = oldsz + base; // vm addr
+  for(; a < newsz + base; a += PGSIZE){
     mem = kalloc();
     if(mem == 0){
-      uvmdealloc(pagetable, a, oldsz);
+      uvmdealloc(pagetable, a - base, oldsz, base);
       return 0;
     }
     memset(mem, 0, PGSIZE);
     if(mappages(pagetable, a, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
       kfree(mem);
-      uvmdealloc(pagetable, a, oldsz);
+      uvmdealloc(pagetable, a - base, oldsz, base);
       return 0;
     }
   }
@@ -264,11 +264,11 @@ uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz)
 // need to be less than oldsz.  oldsz can be larger than the actual
 // process size.  Returns the new process size.
 uint64
-uvmdealloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz)
+uvmdealloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz, uint64 base)
 {
   if(newsz >= oldsz)
     return oldsz;
-  uvmunmap(pagetable, newsz, oldsz - newsz, 1);
+  uvmunmap(pagetable, newsz + base, oldsz - newsz, 1);
   return newsz;
 }
 
@@ -295,9 +295,9 @@ freewalk(pagetable_t pagetable)
 // Free user memory pages,
 // then free page-table pages.
 void
-uvmfree(pagetable_t pagetable, uint64 sz)
+uvmfree(pagetable_t pagetable, uint64 sz, uint64 base)
 {
-  uvmunmap(pagetable, 0, sz, 1);
+  uvmunmap(pagetable, base, sz, 1);
   freewalk(pagetable);
 }
 
