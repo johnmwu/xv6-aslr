@@ -47,9 +47,9 @@ exec(char *path, char **argv)
 
   if((pagetable = proc_pagetable(p)) == 0)
     goto bad;
-
+  
   // Compute address space randomizations
-  prog_aslr = 0x2000;
+  prog_aslr = 0x1000;
 
   // Load program into memory.
   sz = 0;

@@ -6,13 +6,15 @@
 int test_sh()
 {
   char *argx[] = {"sh", 0};
-  int pid;
+  int pid; 
   pid = fork();
   if(pid == 0){
+    
     exec("sh", argx);
-    exit(1);
+  // exit(1);
   }
   else{
+    wait(0);
     exit(0);
   }
   return -1;
