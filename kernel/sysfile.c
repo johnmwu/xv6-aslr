@@ -437,9 +437,16 @@ sys_exec(void)
       return -1;
     }
   }
-
+  
+  
   int ret = exec(path, argv);
-
+  acquire(&tickslock);
+  //printf("ticks is: %d\n", ticks);
+  //printf("old_ticks is: %d\n", old_ticks);
+  old_ticks = ticks;
+  tick_dif = ticks - old_ticks;
+  wakeup(&ticks);
+  release(&tickslock);
   for(i = 0; i < NELEM(argv) && argv[i] != 0; i++)
     kfree(argv[i]);
 

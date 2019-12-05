@@ -142,6 +142,9 @@ void            syscall();
 
 // trap.c
 extern uint     ticks;
+extern uint     old_ticks;
+extern uint     tick_dif;
+extern uint     intr_count;
 void            trapinit(void);
 void            trapinithart(void);
 extern struct spinlock tickslock;
@@ -207,3 +210,6 @@ void lst_push(struct list*, void *);
 void *lst_pop(struct list*);
 void lst_print(struct list*);
 int lst_empty(struct list*);
+
+//random .c
+uint64 random(void);

@@ -1996,7 +1996,7 @@ main(int argc, char *argv[])
 
   rmdot();
   fourteen();
-  bigfile();
+  //bigfile();
   subdir();
   linktest();
   unlinkread();

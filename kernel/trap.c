@@ -8,7 +8,10 @@
 
 struct spinlock tickslock;
 uint ticks;
-
+//struct spinlock ticksdlock;
+uint old_ticks;
+uint tick_dif;
+uint intr_count;
 extern char trampoline[], uservec[], userret[];
 
 // in kernelvec.S, calls kerneltrap().
@@ -20,6 +23,7 @@ void
 trapinit(void)
 {
   initlock(&tickslock, "time");
+  //initlock(&tickslock, "time_dif");
 }
 
 // set up to take exceptions and traps while in the kernel.
@@ -188,11 +192,21 @@ devintr()
 
     if(irq == UART0_IRQ){
       uartintr();
+      intr_count++;
+      
     } else if(irq == VIRTIO0_IRQ || irq == VIRTIO1_IRQ ){
       virtio_disk_intr(irq - VIRTIO0_IRQ);
+      //record ticks dif
+      //acquire(&tickslock);
+      //printf("t is %d\n", ticks);
+      //printf("ot is %d\n", old_ticks); 
+      intr_count++;
+ 
     }
 
     plic_complete(irq);
+
+    
     return 1;
   } else if(scause == 0x8000000000000001L){
     // software interrupt from a machine-mode timer interrupt,

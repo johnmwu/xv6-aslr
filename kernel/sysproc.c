@@ -95,3 +95,41 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_aslron(void)
+{
+  struct proc *p = myproc();
+  if(p->aslr == 0){
+    p->aslr = 1;
+    printf("aslr enabled\n");
+    return 0;
+  }
+  else if(p->aslr == 1){
+    //printf("aslr is already enabled\n");
+    return -1;
+  }
+  else{
+    //printf("enabling aslr failed\n");
+    return -1;
+  }
+}
+
+uint64
+sys_aslroff(void)
+{
+  struct proc *p = myproc();
+  if(p->aslr == 1){
+    p->aslr = 0;
+    printf("aslr disabled\n");
+    return 0;
+  }
+  else if(p->aslr == 0){
+    //printf("aslr is already disabled\n");
+    return -1;
+  }
+  else{
+    //printf("disabling aslr failed\n");
+    return -1;
+  }
+}

@@ -164,17 +164,17 @@ main(void)
         fprintf(2, "cannot cd %s\n", buf+3);
       continue;
     }
-    if(buf[0] == 'a' && buf[1] == 's' && buf[2] == 'l' && buf[3] == 'r' && buf[4] == 'o' && buf[5] == 'n'){
+    if(buf[0] == 'a' && buf[1] == 's' && buf[2] == 'l' && buf[3] == 'r' && buf[4] == 'o' && aslr[5] == 'n'){
       buf[strlen(buf)-1] = 0;
       if(aslron() < 0){
-        printf("failed to enable aslr\n");
+        printf("failed to turn on aslr\n");
       }
       continue;
     }
-    if(buf[0] == 'a' && buf[1] == 's' && buf[2] == 'l' && buf[3] == 'r' && buf[4] == 'o' && buf[5] == 'f' && buf[6] == 'f'){
+    if(buf[0] == 'a' && buf[1] == 's' && buf[2] == 'l' && buf[3] == 'r' && buf[4] == 'o' && aslr[5] == 'f' && aslr[6] == 'f'){
       buf[strlen(buf)-1] = 0;
       if(aslroff() < 0){
-        printf("failed to disable aslr\n");
+        printf("failed to turn off aslr\n");
       }
       continue;
     }

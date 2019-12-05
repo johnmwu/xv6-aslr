@@ -94,7 +94,7 @@ struct vma {
 // Per-process state
 struct proc {
   struct spinlock lock;
-
+  
   // p->lock must be held when using these:
   enum procstate state;        // Process state
   struct proc *parent;         // Parent process
@@ -104,6 +104,9 @@ struct proc {
   int pid;                     // Process ID
   
 
+  //aslr flag, should it be locked? (i think so)
+  int aslr;
+  
   // these are private to the process, so p->lock need not be held.
   uint64 kstack;               // Bottom of kernel stack for this process
   uint64 sz;                   // Size of process memory (bytes)
