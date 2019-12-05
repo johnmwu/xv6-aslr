@@ -53,8 +53,8 @@ exec(char *path, char **argv)
 
   // Compute prog aslr
   r = random();
-  // prog_aslr = PGROUNDDOWN(r);
-  prog_aslr = 0x1000; 
+  prog_aslr = PGROUNDDOWN(r);
+  // prog_aslr = 0x1000; 
   prog_vma.base = prog_aslr; 
 
   // Load program into memory.
@@ -81,8 +81,6 @@ exec(char *path, char **argv)
   prog_vma.sz = sz;
   prog_vma.flags |= VMA_VALID;
 
-  printf("got here 1\n");
-
   p = myproc();
   // uint64 oldsz = p->sz;
 
@@ -91,8 +89,8 @@ exec(char *path, char **argv)
 
   // Compute stack aslr
   r = random();
-  // stack_aslr = PGROUNDDOWN(r);
-  stack_aslr = 0x1000;
+  stack_aslr = PGROUNDDOWN(r);
+  // stack_aslr = 0x1000;
   stack_vma.base = prog_vma.base + PGROUNDUP(sz) + stack_aslr; 
 
   // Setup stack
@@ -103,7 +101,6 @@ exec(char *path, char **argv)
   stackbase = sp - PGSIZE;
   stack_vma.sz = sz;
   stack_vma.flags |= VMA_VALID;
-  printf("got here 2\n");
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
@@ -113,10 +110,8 @@ exec(char *path, char **argv)
     sp -= sp % 16; // riscv sp must be 16-byte aligned
     if(sp < stackbase)
       goto bad;
-    printf("got here 7\n");
     if(copyout(pagetable, sp, argv[argc], strlen(argv[argc]) + 1) < 0)
       goto bad;
-    printf("got here 8\n");
     ustack[argc] = sp;
   }
   ustack[argc] = 0;
@@ -126,10 +121,8 @@ exec(char *path, char **argv)
   sp -= sp % 16;
   if(sp < stackbase)
     goto bad;
-  printf("got here 6\n");
   if(copyout(pagetable, sp, (char *)ustack, (argc+1)*sizeof(uint64)) < 0)
     goto bad;
-  printf("got here 5\n");
 
   // arguments to user main(argc, argv)
   // argc is returned via the system call return
@@ -144,7 +137,6 @@ exec(char *path, char **argv)
     
   // Free up memory
   proc_freepagetable(p);
-  printf("got here 4\n");
 
   // Commit to the user image.
   // oldpagetable = p->pagetable;
@@ -155,7 +147,6 @@ exec(char *path, char **argv)
   p->vmas[0].flags &= ~VMA_VALID; // to remove
   p->vmas[PROG_VMA_IDX] = prog_vma;
   p->vmas[STACK_VMA_IDX] = stack_vma;
-  printf("got here 3\n");
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
  bad:

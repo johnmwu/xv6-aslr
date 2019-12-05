@@ -33,7 +33,7 @@ extern uint64 random(void){
   // printf("square is: %d\n", square);
   //printf("final value: %d\n", square % 1000000000);
   uint hashed = hash(square);
-  uint64 mod = 1000000000000000000;
+  uint64 mod = 0x1000000;
   prev_rand = (uint64)hashed % mod;
   return prev_rand;
 }
