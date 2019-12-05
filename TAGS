@@ -1,13 +1,13 @@
 
-user/alloctest.c,107
+user/alloctest.c,106
 test0(10,188
   enum { NCHILD 11,198
   enum { NCHILD = 50, NFD 11,198
-void test1(56,1043
-main(106,2001
+void test1(53,989
+main(103,1950
 
-user/uthread_switch.S,35
-thread_switch:thread_switch9,138
+user/uthread_switch.S,37
+uthread_switch:uthread_switch8,198
 
 user/user.h,15
 int exit(6,62
@@ -26,27 +26,84 @@ free(25,386
 morecore(47,849
 malloc(64,1082
 
+user/shv2.c,1130
+#define EXEC 8,120
+#define REDIR 9,136
+#define PIPE 10,152
+#define LIST 11,168
+#define BACK 12,184
+#define MAXARGS 14,201
+struct cmd 16,221
+  int type;17,234
+struct execcmd 20,250
+  int type;21,267
+  char *argv[argv22,279
+  char *eargv[eargv23,302
+struct redircmd 26,330
+  int type;27,348
+  struct cmd *cmd;cmd28,360
+  char *file;file29,379
+  char *efile;efile30,393
+  int mode;31,408
+  int fd;32,420
+struct pipecmd 35,434
+  int type;36,451
+  struct cmd *left;left37,463
+  struct cmd *right;right38,483
+struct listcmd 41,508
+  int type;42,525
+  struct cmd *left;left43,537
+  struct cmd *right;right44,557
+struct backcmd 47,582
+  int type;48,599
+  struct cmd *cmd;cmd49,611
+runcmd(58,769
+getcmd(134,2095
+main(145,2247
+panic(189,3356
+fork1(196,3416
+execcmd(210,3552
+redircmd(221,3716
+pipecmd(237,4039
+listcmd(250,4276
+backcmd(263,4513
+char whitespace[whitespace276,4724
+char symbols[symbols277,4757
+gettoken(280,4790
+peek(325,5399
+parsecmd(342,5726
+parseline(359,5975
+parsepipe(376,6268
+parseredirs(389,6477
+parseblock(414,7009
+parseexec(430,7313
+nulterminate(464,7982
+
 user/zombie.c,12
 main(9,143
 
-user/bcachetest.c,235
-main(13,209
-createfile(21,281
-readfile(42,648
-test0(66,1100
-  enum { N 70,1141
-  enum { N = 10, NCHILD 70,1141
-void test1(124,2060
-  enum { N 127,2091
-  enum { N = 100, BIG=127,2091
-  enum { N = 100, BIG=100, NCHILD=127,2091
+user/bcachetest.c,143
+#define NCHILD 8,153
+#define N 9,170
+#define BIG 10,185
+main(16,235
+createfile(24,307
+readfile(44,656
+test0(64,1034
+void test1(96,1560
+
+user/test-struct1.c,71
+struct two_int 6,101
+  uint64 a;7,118
+  uint64 b;8,130
+main(12,161
 
 user/cat.c,42
 char buf[buf5,75
 cat(8,96
 main(25,332
 
-user/ulib.c,165
+user/ulib.c,144
 strcpy(7,107
 strcmp(18,217
 strlen(26,334
@@ -56,8 +113,7 @@ gets(56,671
 stat(74,904
 atoi(88,1070
 memmove(99,1191
-memcmp(119,1467
-memcpy(133,1667
+sh(112,1359
 
 user/stressfs.c,13
 main(17,499
@@ -76,13 +132,19 @@ int matchstar(97,1747
 user/mkdir.c,11
 main(6,79
 
+user/vuln1.c,48
+store_int(7,131
+vuln_func(14,220
+main(24,375
+
+user/test_sh_libc.c,36
+int test_sh(6,101
+int main(23,288
+
 user/call.c,45
 int g(6,101
 int f(10,133
 void main(14,166
-
-user/bigfile.c,12
-main(8,128
 
 user/forktest.c,61
 #define N 8,180
@@ -90,14 +152,8 @@ print(11,202
 forktest(17,259
 main(52,712
 
-user/symlinktest.c,133
-#define fail(12,260
-static int failed 13,347
-main(20,460
-cleanup(29,564
-stat_slink(45,913
-testsymlink(56,1092
-concur(135,3110
+user/test-exec1.c,12
+main(7,105
 
 user/sh.c,1130
 #define EXEC 8,120
@@ -133,54 +189,52 @@ struct backcmd 47,582
 runcmd(58,769
 getcmd(134,2095
 main(145,2247
-panic(175,2862
-fork1(182,2922
-execcmd(196,3058
-redircmd(207,3222
-pipecmd(223,3545
-listcmd(236,3782
-backcmd(249,4019
-char whitespace[whitespace262,4230
-char symbols[symbols263,4263
-gettoken(266,4296
-peek(311,4905
-parsecmd(328,5232
-parseline(345,5481
-parsepipe(362,5774
-parseredirs(375,5983
-parseblock(400,6515
-parseexec(416,6819
-nulterminate(450,7488
+panic(189,3351
+fork1(196,3411
+execcmd(210,3547
+redircmd(221,3711
+pipecmd(237,4034
+listcmd(250,4271
+backcmd(263,4508
+char whitespace[whitespace276,4719
+char symbols[symbols277,4752
+gettoken(280,4785
+peek(325,5394
+parsecmd(342,5721
+parseline(359,5970
+parsepipe(376,6263
+parseredirs(389,6472
+parseblock(414,7004
+parseexec(430,7308
+nulterminate(464,7977
 
 user/init.c,36
 char *argv[argv8,142
 main(11,175
 
-user/uthread.c,682
+user/uthread.c,643
 #define FREE 6,110
 #define RUNNING 7,134
 #define RUNNABLE 8,158
 #define STACK_SIZE 10,183
 #define MAX_THREAD 11,208
-struct thread 13,231
-  char       stack[stack14,247
-  int        state;15,304
-struct thread all_thread[all_thread17,369
-struct thread *current_thread;current_thread18,407
-thread_init(22,502
-thread_schedule(34,927
-thread_create(69,1681
-thread_yield(81,1882
-volatile int a_started,87,1963
-volatile int a_started, b_started,87,1963
-volatile int a_started, b_started, c_started;87,1963
-volatile int a_n,88,2009
-volatile int a_n, b_n,88,2009
-volatile int a_n, b_n, c_n;88,2009
-thread_a(91,2044
-thread_b(111,2391
-thread_c(131,2738
-main(151,3084
+typedef struct thread thread_t,13,231
+typedef struct thread thread_t, *thread_p;thread_p13,231
+typedef struct mutex mutex_t,14,274
+typedef struct mutex mutex_t, *mutex_p;mutex_p14,274
+struct thread 16,315
+  uint64     sp;17,331
+  char stack[stack18,389
+  int        state;19,446
+static thread_t all_thread[all_thread21,511
+thread_p  current_thread;22,551
+thread_p  next_thread;23,577
+thread_init(27,665
+thread_schedule(39,1098
+thread_create(70,1848
+thread_yield(84,2269
+mythread(91,2363
+main(106,2624
 
 user/rm.c,11
 main(6,79
@@ -188,114 +242,120 @@ main(6,79
 user/ln.c,11
 main(6,79
 
+user/mounttest.c,156
+main(19,335
+void test0(29,435
+void test1(135,2354
+#define NPID 211,3647
+#define NOP 212,3662
+void test2(217,3851
+void test3(274,4903
+test4(322,5866
+
+user/cow.c,198
+simpletest(13,278
+threetest(54,1001
+char junk1[junk1120,2172
+int fds[fds121,2190
+char junk2[junk2122,2202
+char buf[buf123,2220
+char junk3[junk3124,2236
+filetest(128,2308
+main(180,3185
+
 user/wc.c,41
 char buf[buf5,75
 wc(8,96
 main(36,552
 
-user/usertests.c,1912
-#define BUFSZ 20,599
-char buf[buf22,637
-char name[name23,654
-iputtest(27,726
-exitiputtest(49,1153
-openiputtest(89,1970
-opentest(122,2520
-writetest(140,2786
-  enum { N=144,2826
-  enum { N=100, SZ=144,2826
-writebig(181,3592
-createtest(236,4619
-  enum { N=239,4654
-void dirtest(256,4922
-exectest(283,5346
-pipe1(340,6389
-  enum { N=344,6462
-  enum { N=5, SZ=344,6462
-preempt(394,7469
-exitwait(450,8341
-reparent(480,8889
-twochildren(508,9377
-forkfork(536,9854
-  enum { N=538,9874
-forkforkfork(572,10420
-reparent2(607,11182
-mem(628,11482
-sharedfd(663,12069
-  enum { N 666,12118
-  enum { N = 1000, SZ=666,12118
-fourfiles(720,13209
-  enum { N=725,13326
-  enum { N=12, NCHILD=725,13326
-  enum { N=12, NCHILD=4, SZ=725,13326
-createdelete(786,14502
-  enum { N 788,14526
-  enum { N = 20, NCHILD=788,14526
-unlinkread(858,16015
-  enum { SZ 860,16037
-linktest(902,16865
-  enum { SZ 904,16885
-concreate(962,17973
-  enum { N 964,17994
-    ushort inum;969,18075
-    char name[name970,18092
-linkunlink(1057,19842
-bigdir(1088,20325
-  enum { N 1090,20343
-subdir(1128,21003
-bigwrite(1308,24978
-bigfile(1333,25452
-  enum { N 1335,25471
-  enum { N = 20, SZ=1335,25471
-fourteen(1386,26462
-rmdot(1424,27437
-dirfile(1461,28143
-iref(1517,29336
-forktest(1549,29982
-  enum{ N 1551,30002
-sbrkbasic(1586,30507
-  enum { TOOMUCH=1588,30528
-sbrkmuch(1628,31293
-  enum { BIG=1630,31313
-kernmem(1683,32499
-sbrkfail(1708,33002
-  enum { BIG=1710,33022
-sbrkarg(1773,34383
-validatetest(1800,34841
-char uninit[uninit1816,35178
-bsstest(1818,35203
-bigargtest(1834,35515
-fsfull(1869,36430
-void argptest(1919,37461
-unsigned long randstate 1931,37641
-rand(1933,37683
-stacktest(1942,37858
-pgbug(1969,38474
-sbrkbugs(1984,38803
-badwrite(2044,40189
-badarg(2078,40870
-run(2093,41131
-main(2116,41490
-  struct test 2123,41577
-    void (*f)f2124,41593
-    char *s;s2125,41616
+user/usertests.c,1660
+#define BUFSZ 11,234
+char buf[buf13,272
+char name[name14,289
+char *echoargv[echoargv15,303
+iputtest(19,421
+exitiputtest(44,871
+openiputtest(86,1686
+opentest(120,2233
+writetest(140,2535
+  enum { N=144,2572
+  enum { N=100, SZ=144,2572
+writetest1(190,3546
+createtest(247,4553
+  enum { N=250,4585
+void dirtest(270,4961
+exectest(297,5350
+pipe1(309,5521
+  enum { N=313,5582
+  enum { N=5, SZ=313,5582
+preempt(363,6555
+exitwait(421,7447
+reparent(454,8028
+twochildren(490,8644
+forkfork(521,9167
+  enum { N=524,9207
+forkforkfork(559,9750
+mem(593,10284
+sharedfd(630,10913
+  enum { N 633,10959
+  enum { N = 1000, SZ=633,10959
+fourfiles(684,12023
+  enum { N=689,12137
+  enum { N=12, NCHILD=689,12137
+  enum { N=12, NCHILD=4, SZ=689,12137
+createdelete(751,13300
+  enum { N 753,13321
+  enum { N = 20, NCHILD=753,13321
+unlinkread(824,14787
+  enum { SZ 826,14806
+linktest(870,15652
+  enum { SZ 872,15669
+concreate(934,16747
+  enum { N 936,16765
+    ushort inum;941,16846
+    char name[name942,16863
+linkunlink(1028,18566
+bigdir(1063,19097
+  enum { N 1065,19112
+subdir(1106,19804
+bigwrite(1290,23590
+bigfile(1319,24105
+  enum { N 1321,24121
+  enum { N = 20, SZ=1321,24121
+fourteen(1376,25124
+rmdot(1417,26111
+dirfile(1456,26808
+iref(1516,27987
+forktest(1551,28682
+  enum{ N 1553,28699
+sbrktest(1592,29231
+  enum { BIG=1594,29248
+  enum { BIG=100*1024*1024, TOOMUCH=1594,29248
+validatetest(1780,33252
+char uninit[uninit1800,33637
+bsstest(1802,33662
+bigargtest(1820,34015
+fsfull(1855,34940
+void argptest(1905,35959
+unsigned long randstate 1918,36160
+rand(1920,36202
+stacktest(1929,36377
+main(1953,36822
 
-user/kalloctest.c,90
+user/kalloctest.c,91
 #define NCHILD 8,157
 #define N 9,174
 main(15,225
 void test0(22,292
-void test1(60,990
+void test1(58,1007
 
-user/alarmtest.c,177
-main(22,394
-volatile static int count;30,472
-periodic(33,505
-test0(43,659
-void __attribute__ ((noinline)) foo(63,1023
-test1(79,1423
-test2(112,2314
-slow_handler(144,2844
+user/alarmtest.c,137
+main(20,359
+volatile static int count;27,425
+periodic(30,458
+test0(40,612
+void __attribute__ ((noinline)) foo(60,930
+test1(68,1055
 
 user/printf.c,129
 static char digits[digits7,96
@@ -306,7 +366,7 @@ vprintf(52,791
 fprintf(98,1800
 printf(107,1908
 
-user/usys.S,898
+user/usys.S,984
 .global 3,65
 fork:fork4,78
 .global 8,113
@@ -357,17 +417,10 @@ crash:crash114,1171
 mount:mount119,1222
 .global 123,1259
 umount:umount124,1274
-
-user/cowtest.c,198
-simpletest(13,278
-threetest(54,1001
-char junk1[junk1120,2172
-int fds[fds121,2190
-char junk2[junk2122,2202
-char buf[buf123,2220
-char junk3[junk3124,2236
-filetest(128,2308
-main(181,3214
+.global 128,1313
+aslron:aslron129,1328
+.global 133,1367
+aslroff:aslroff134,1383
 
 user/testsh.c,285
 unsigned int seed 11,162
@@ -385,9 +438,9 @@ t4(196,3913
 t5(232,4531
 t6(260,4981
 t7(282,5452
-t8(308,5897
-t9(332,6371
-main(367,7047
+t8(308,5895
+t9(332,6367
+main(367,7043
 
 user/ls.c,40
 fmtname(7,104
@@ -404,6 +457,10 @@ exit:exit15,222
 init:init21,311
 .p2align 25,368
 argv:argv26,379
+
+user/crashtest.c,32
+main(15,279
+void test0(21,335
 
 kernel/stat.h,179
 #define T_DIR 1,0
@@ -432,7 +489,7 @@ acquiresleep(22,331
 releasesleep(34,512
 holdingsleep(44,643
 
-kernel/syscall.h,550
+kernel/syscall.h,684
 #define SYS_fork 2,23
 #define SYS_exit 3,45
 #define SYS_wait 4,67
@@ -455,6 +512,11 @@ kernel/syscall.h,550
 #define SYS_mkdir 21,441
 #define SYS_close 22,463
 #define SYS_ntas 25,511
+#define SYS_crash 26,533
+#define SYS_mount 27,555
+#define SYS_umount 28,577
+#define SYS_aslron 30,600
+#define SYS_aslroff 31,622
 
 kernel/fs.c,587
 #define min(24,694
@@ -481,15 +543,15 @@ itrunc(414,10337
 stati(446,10909
 readi(460,11222
 writei(487,11860
-namecmp(523,12630
-dirlookup(531,12813
-dirlink(558,13409
-skipelem(601,14524
-namex(630,15154
-namei(665,15773
-nameiparent(672,15862
+namecmp(518,12454
+dirlookup(526,12637
+dirlink(553,13233
+skipelem(596,14348
+namex(625,14978
+namei(660,15597
+nameiparent(667,15686
 
-kernel/param.h,309
+kernel/param.h,333
 #define NPROC 1,0
 #define NCPU 2,56
 #define NOFILE 3,107
@@ -504,6 +566,7 @@ kernel/param.h,309
 #define FSSIZE 12,638
 #define MAXPATH 13,698
 #define NDISK 14,751
+#define MAXHEAP 15,774
 
 kernel/kernelvec.S,129
 .globl 7,171
@@ -514,7 +577,7 @@ kernelvec:kernelvec10,215
 .align 92,2030
 timervec:timervec93,2039
 
-kernel/sysfile.c,318
+kernel/sysfile.c,338
 argfd(22,492
 fdalloc(41,856
 sys_dup(56,1057
@@ -527,11 +590,12 @@ isdirempty(170,2785
 sys_unlink(185,3066
 create(242,4027
 sys_open(287,4936
-sys_mkdir(352,6093
-sys_mknod(368,6351
-sys_chdir(388,6707
-sys_exec(413,7108
-sys_pipe(456,7883
+sys_mkdir(351,6069
+sys_mknod(367,6327
+sys_chdir(387,6683
+sys_exec(412,7084
+sys_pipe(457,7974
+sys_crash(489,8686
 
 kernel/fs.h,698
 #define ROOTINO 5,92
@@ -607,16 +671,16 @@ typedef unsigned int  uint32;7,151
 typedef unsigned long uint64;8,181
 typedef uint64 pde_t;10,212
 
-kernel/syscall.c,117
+kernel/syscall.c,118
 fetchaddr(12,218
-fetchstr(25,581
-argraw(35,776
-argint(58,1117
-argaddr(68,1287
-argstr(78,1526
-syscall(135,2918
+fetchstr(34,871
+argraw(44,1066
+argint(67,1407
+argaddr(77,1577
+argstr(87,1816
+syscall(150,3382
 
-kernel/file.h,862
+kernel/file.h,838
 struct file 1,0
   enum { FD_NONE,2,14
   enum { FD_NONE, FD_PIPE,2,14
@@ -629,28 +693,27 @@ struct file 1,0
   struct pipe *pipe;pipe6,133
   struct inode *ip;ip7,165
   uint off;8,212
-  short major;9,259
-  short minor;10,293
-#define major(13,331
-#define minor(14,374
-#define	mkdev(15,411
-struct inode 18,485
-  uint dev;19,500
-  uint inum;20,539
-  int ref;21,577
-  struct sleeplock lock;22,618
-  int valid;23,677
-  short type;25,734
-  short major;26,778
-  short minor;27,793
-  short nlink;28,808
-  uint size;29,823
-  uint addrs[addrs30,836
-struct devsw 34,913
-  int (*read)read35,928
-  int (*write)write36,976
-#define DISK 41,1059
-#define CONSOLE 42,1074
+  short major;9,245
+#define major(12,283
+#define minor(13,326
+#define	mkdev(14,363
+struct inode 17,437
+  uint dev;18,452
+  uint inum;19,491
+  int ref;20,529
+  struct sleeplock lock;21,570
+  int valid;22,629
+  short type;24,686
+  short major;25,730
+  short minor;26,745
+  short nlink;27,760
+  uint size;28,775
+  uint addrs[addrs29,788
+struct devsw 33,865
+  int (*read)read34,880
+  int (*write)write35,913
+#define DISK 40,981
+#define CONSOLE 41,996
 
 kernel/uart.c,280
 #define Reg(16,320
@@ -766,9 +829,9 @@ filedup(48,766
 fileclose(60,976
 filestat(88,1515
 fileread(107,1893
-filewrite(135,2473
+filewrite(133,2387
 
-kernel/proc.c,675
+kernel/proc.c,674
 struct cpu cpus[cpus12,196
 struct proc proc[proc14,220
 struct proc *initproc;initproc16,246
@@ -781,41 +844,41 @@ myproc(69,1306
 allocpid(78,1422
 allocproc(94,1757
 freeproc(133,2530
-proc_pagetable(154,2932
-proc_freepagetable(178,3571
-uchar initcode[initcode188,3825
-userinit(200,4204
-growproc(227,4794
-fork(247,5180
-reparent(294,6032
-exit(321,6964
-wait(386,8695
-scheduler(445,10422
-sched(489,11545
-yield(510,11965
-forkret(522,12173
-sleep(543,12618
-wakeup(577,13309
-wakeup1(593,13625
-kill(606,13914
-either_copyout(630,14373
-either_copyin(645,14723
-procdump(660,15100
+proc_pagetable(154,2914
+proc_freepagetable(178,3553
+uchar initcode[initcode194,3941
+userinit(206,4320
+growproc(237,5035
+fork(260,5554
+reparent(310,6494
+exit(340,7434
+wait(384,8221
+scheduler(443,9948
+sched(487,11071
+yield(508,11491
+forkret(520,11699
+sleep(541,12144
+wakeup(575,12835
+wakeup1(591,13151
+kill(602,13393
+either_copyout(626,13852
+either_copyin(641,14202
+procdump(656,14579
 
 kernel/exec.c,31
 exec(13,248
-loadseg(133,3270
+loadseg(159,3892
 
-kernel/kalloc.c,199
+kernel/kalloc.c,200
 struct run 17,404
   struct run *next;next18,417
   struct spinlock lock;22,450
   struct run *freelist;freelist23,474
 } kmem;24,498
 kinit(27,512
-freerange(34,596
-kfree(47,959
-kalloc(69,1436
+freerange(36,646
+kfree(49,1009
+kalloc(71,1486
 
 kernel/console.c,296
 #define BACKSPACE 25,486
@@ -829,25 +892,24 @@ consputc(32,595
   uint e;57,1015
 } cons;58,1040
 consolewrite(64,1100
-consoleread(87,1522
-consoleintr(143,2666
-consoleinit(189,3596
+consoleread(87,1506
+consoleintr(143,2634
+consoleinit(189,3564
 
-kernel/spinlock.h,130
+kernel/spinlock.h,96
 struct spinlock 2,26
   uint locked;3,44
   char *name;name6,107
   struct cpu *cpu;cpu7,145
-  uint n;8,195
-  uint nts;9,205
 
-kernel/plic.c,79
+kernel/plic.c,101
 plicinit(12,168
 plicinithart(20,334
-plic_claim(33,650
-plic_complete(43,837
+plic_pending(34,667
+plic_claim(47,899
+plic_complete(57,1086
 
-kernel/log.c,494
+kernel/log.c,513
 struct logheader 35,1148
   int n;36,1167
   int block[block37,1176
@@ -870,6 +932,7 @@ end_op(146,3718
 write_log(178,4445
 commit(193,4801
 log_write(214,5453
+crash_op(239,6041
 
 kernel/list.c,105
 lst_init(13,290
@@ -879,16 +942,20 @@ lst_pop(31,521
 lst_push(40,669
 lst_print(50,833
 
-kernel/trap.c,187
+kernel/trap.c,281
 struct spinlock tickslock;9,139
 uint ticks;10,166
-trapinit(20,314
-trapinithart(27,431
-usertrap(37,591
-usertrapret(90,1669
-kerneltrap(134,3170
-clockintr(163,3914
-devintr(177,4169
+uint old_ticks;12,208
+uint64 prev_rand;13,224
+uint tick_dif;14,288
+uint intr_count;15,303
+trapinit(24,455
+trapinithart(32,610
+usertrap(42,770
+usertrapret(96,1888
+kerneltrap(140,3368
+clockintr(169,4112
+devintr(183,4367
 
 kernel/date.h,132
 struct rtcdate 1,0
@@ -909,9 +976,9 @@ struct pipe 13,195
   int readopen;18,343
   int writeopen;19,386
 pipealloc(23,438
-pipeclose(59,1092
-pipewrite(77,1415
-piperead(103,1984
+pipeclose(59,1081
+pipewrite(77,1404
+piperead(103,1973
 
 kernel/sleeplock.h,112
 struct sleeplock 2,33
@@ -922,25 +989,25 @@ struct sleeplock 2,33
 
 kernel/vm.c,385
 pagetable_t kernel_pagetable;12,167
-kvminit(26,500
-kvminithart(60,1476
-walk(79,2093
-walkaddr(102,2678
-kvmmap(125,3077
-kvmpa(136,3354
-mappages(156,3824
-uvmunmap(181,4363
-uvmcreate(212,5015
-uvminit(226,5330
-uvmalloc(241,5750
-uvmdealloc(272,6519
-freewalk(287,6862
-uvmfree(307,7374
-uvmcopy(320,7706
-uvmclear(352,8393
-copyout(366,8691
-copyin(391,9236
-copyinstr(417,9826
+kvminit(24,474
+kvminithart(58,1450
+walk(77,2067
+walkaddr(100,2652
+kvmmap(120,3018
+kvmpa(131,3295
+mappages(151,3765
+uvmunmap(176,4304
+uvmcreate(207,4956
+uvminit(221,5271
+uvmalloc(236,5691
+uvmdealloc(267,6524
+freewalk(278,6817
+uvmfree(298,7329
+uvmcopy(311,7677
+uvmclear(343,8364
+copyout(357,8662
+copyin(382,9213
+copyinstr(408,9809
 
 kernel/string.c,127
 memset(4,26
@@ -962,44 +1029,38 @@ printint(29,467
 printptr(53,771
 printf(64,1008
 panic(118,1926
-printfinit(131,2289
+printfinit(130,2072
 
-kernel/buddy.c,888
-static int nsizes;10,141
-#define LEAF_SIZE 12,208
-#define MAXSIZE 13,284
-#define BLK_SIZE(14,368
-#define HEAP_SIZE 15,444
-#define NBLK(16,485
-#define ROUNDUP(17,563
-typedef struct list Bd_list;19,652
-struct sz_info 27,1036
-  Bd_list free;28,1053
-  char *alloc;alloc29,1069
-  char *split;split30,1084
-typedef struct sz_info Sz_info;32,1102
-static Sz_info *bd_sizes;bd_sizes34,1135
-static void *bd_base;bd_base35,1162
-static struct spinlock lock;36,1244
-int bit_isset(39,1332
-void bit_set(46,1499
-void bit_clear(53,1667
-bd_print_vector(61,1855
-bd_print(82,2250
-firstk(97,2640
-blk_index(110,2819
-void *addr(addr116,2964
-bd_malloc(123,3137
-size(158,4021
-bd_free(170,4260
-blk_index_next(198,5021
-log2(206,5180
-bd_mark(217,5347
-bd_initfree_pair(240,5919
-bd_initfree(258,6549
-bd_mark_data_structures(274,6937
-bd_mark_unavailable(283,7187
-bd_init(296,7617
+kernel/buddy.c,729
+static int nsizes 10,141
+#define LEAF_SIZE 12,183
+#define MAXSIZE 13,251
+#define BLK_SIZE(14,319
+#define HEAP_SIZE 15,395
+#define NBLK(16,436
+#define ROUNDUP(17,507
+typedef struct list Bd_list;19,596
+struct sz_info 27,980
+  Bd_list free;28,997
+  char *alloc;alloc29,1013
+  char *split;split30,1028
+typedef struct sz_info Sz_info;32,1046
+static Sz_info *bd_sizes;bd_sizes34,1079
+static void *bd_base;bd_base35,1105
+static struct spinlock lock;36,1187
+int bit_isset(39,1275
+void bit_set(46,1442
+void bit_clear(53,1610
+bd_print(60,1746
+firstk(81,2244
+blk_index(94,2423
+void *addr(addr100,2568
+bd_malloc(106,2665
+size(138,3452
+bd_free(148,3611
+blk_index_next(174,4167
+log2(182,4326
+bd_init(193,4485
 
 kernel/start.c,126
 __attribute__ ((aligned (16))) char stack0[stack011,167
@@ -1076,14 +1137,14 @@ sfence_vma(317,5658
 #define PA2PTE(337,6171
 #define PTE2PA(339,6220
 #define PTE_FLAGS(341,6263
-#define PXMASK 344,6373
-#define PXSHIFT(345,6413
-#define PX(346,6459
-#define MAXVA 352,6728
-typedef uint64 pte_t;354,6772
-typedef uint64 *pagetable_t;pagetable_t355,6794
+#define PXMASK 344,6399
+#define PXSHIFT(345,6439
+#define PX(346,6485
+#define MAXVA 352,6754
+typedef uint64 pte_t;354,6798
+typedef uint64 *pagetable_t;pagetable_t355,6820
 
-kernel/proc.h,2351
+kernel/proc.h,2543
 struct context 2,48
   uint64 ra;3,65
   uint64 sp;4,78
@@ -1147,22 +1208,30 @@ enum procstate { UNUSED, SLEEPING,83,2419
 enum procstate { UNUSED, SLEEPING, RUNNABLE,83,2419
 enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING,83,2419
 enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE 83,2419
-struct proc 86,2505
-  struct spinlock lock;87,2519
-  enum procstate state;90,2588
-  struct proc *parent;parent91,2636
-  void *chan;chan92,2685
-  int killed;93,2749
-  int xstate;94,2813
-  int pid;95,2891
-  uint64 kstack;98,3005
-  uint64 sz;99,3071
-  pagetable_t pagetable;100,3136
-  struct trapframe *tf;tf101,3181
-  struct context context;102,3242
-  struct file *ofile[ofile103,3304
-  struct inode *cwd;cwd104,3349
-  char name[name105,3401
+#define VMA_VALID 85,2484
+#define NVMA 86,2506
+struct vma 88,2522
+  int flags;89,2535
+  uint64 base;90,2549
+  int sz;91,2564
+struct proc 95,2599
+  struct spinlock lock;96,2613
+  enum procstate state;99,2684
+  struct proc *parent;parent100,2732
+  void *chan;chan101,2781
+  int killed;102,2845
+  int xstate;103,2909
+  int pid;104,2987
+  int aslr;108,3085
+  uint64 kstack;111,3168
+  uint64 sz;112,3242
+  pagetable_t pagetable;113,3307
+  struct trapframe *tf;tf114,3352
+  struct context context;115,3413
+  struct file *ofile[ofile116,3475
+  struct vma vmas[vmas117,3520
+  struct inode *cwd;cwd118,3545
+  char name[name119,3597
 
 kernel/trampoline.S,140
 .globl 12,345
@@ -1170,29 +1239,30 @@ trampoline:trampoline13,363
 .align 14,375
 .globl 15,384
 uservec:uservec16,399
-.globl 87,2175
-userret:userret88,2190
+.globl 87,2179
+userret:userret88,2194
 
-kernel/spinlock.c,235
-#define NLOCK 11,172
-static int nlock;13,192
-static struct spinlock *locks[locks14,210
-initlock(18,285
-acquire(34,559
-release(62,1359
-holding(91,2247
-push_off(105,2592
-pop_off(116,2730
-print_lock(129,2939
-sys_ntas(136,3084
+kernel/random.c,46
+uint hash(9,120
+extern uint64 random(18,342
+
+kernel/spinlock.c,151
+uint64 ntest_and_set;11,172
+initlock(14,200
+acquire(24,370
+release(49,1077
+holding(76,1877
+push_off(90,2222
+pop_off(101,2360
+sys_ntas(114,2571
 
 kernel/defs.h,182
 void            panic(81,2285
-void            scheduler(96,2751
-#define NELEM(187,5950
-struct list 197,6145
-  struct list *next;next198,6159
-  struct list *prev;prev199,6180
+void            scheduler(96,2746
+#define NELEM(192,6113
+struct list 202,6308
+  struct list *next;next203,6322
+  struct list *prev;prev204,6343
 
 kernel/elf.h,738
 #define ELF_MAGIC 3,37
@@ -1230,7 +1300,7 @@ kernel/ramdisk.c,38
 ramdiskinit(16,255
 ramdiskrw(23,416
 
-kernel/buf.h,231
+kernel/buf.h,265
 struct buf 1,0
   int valid;2,13
   int disk;3,61
@@ -1240,9 +1310,10 @@ struct buf 1,0
   uint refcnt;7,153
   struct buf *prev;prev8,168
   struct buf *next;next9,206
-  uchar data[data10,226
+  struct buf *qnext;qnext10,226
+  uchar data[data11,261
 
-kernel/sysproc.c,142
+kernel/sysproc.c,185
 sys_exit(11,164
 sys_getpid(21,278
 sys_fork(27,331
@@ -1251,6 +1322,8 @@ sys_sbrk(42,472
 sys_sleep(56,635
 sys_kill(77,943
 sys_uptime(89,1114
+sys_aslron(100,1240
+sys_aslroff(119,1537
 
 kernel/fcntl.h,89
 #define O_RDONLY 1,0

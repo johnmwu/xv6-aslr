@@ -259,7 +259,7 @@ growproc(int n)
 int
 fork(void)
 {
-  int i, pid;
+  int i, pid, vma_idx;
   struct proc *np;
   struct proc *p = myproc();
 
@@ -269,10 +269,16 @@ fork(void)
   }
 
   // Copy user memory from parent to child.
-  if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){
-    freeproc(np);
-    release(&np->lock);
-    return -1;
+  for(vma_idx=0; vma_idx<NVMA; vma_idx++){
+    if(p->vmas[vma_idx].flags & VMA_VALID){
+      uint64 sz = p->vmas[vma_idx].sz;
+      uint64 base = p->vmas[vma_idx].base;
+      if(uvmcopy(p->pagetable, np->pagetable, sz, base) < 0){
+        freeproc(np);
+        release(&np->lock);
+        return -1;
+      }
+    }
   }
   np->sz = p->sz;
 

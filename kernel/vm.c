@@ -307,15 +307,17 @@ uvmfree(pagetable_t pagetable, uint64 sz, uint64 base)
 // physical memory.
 // returns 0 on success, -1 on failure.
 // frees any allocated pages on failure.
+
+// base assumed page aligned
 int
-uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
+uvmcopy(pagetable_t old, pagetable_t new, uint64 sz, uint64 base)
 {
   pte_t *pte;
   uint64 pa, i;
   uint flags;
   char *mem;
 
-  for(i = 0; i < sz; i += PGSIZE){
+  for(i = base; i < sz+base; i += PGSIZE){
     if((pte = walk(old, i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if((*pte & PTE_V) == 0)
