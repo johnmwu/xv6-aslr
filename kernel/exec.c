@@ -21,8 +21,7 @@ exec(char *path, char **argv)
   pagetable_t pagetable = 0;
   struct proc *p = myproc();
   struct vma prog_vma, stack_vma, heap_vma;
-
-  uint64 prog_aslr, stack_aslr, heap_aslr; 
+  uint64 prog_aslr, stack_aslr, heap_aslr, r; 
 
   begin_op(ROOTDEV);
 
@@ -31,13 +30,6 @@ exec(char *path, char **argv)
     return -1;
   }
   ilock(ip);
-  uint64 r;
-  r = random();
-  printf("random val: %p\n", r);
-  r = random();
-  printf("random val: %p\n", r);
-  r = random();
-  printf("random val: %p\n", r);
 
   //printf("old ticks: %d\n", old_ticks);
   //printf("tick dif: %d\n", tick_dif);
@@ -52,9 +44,12 @@ exec(char *path, char **argv)
     goto bad;
 
   // Compute prog aslr
-  r = random();
-  prog_aslr = PGROUNDDOWN(r);
-  // prog_aslr = 0x1000; 
+  if(p->aslr){
+    r = random();
+    prog_aslr = PGROUNDDOWN(r);
+  } else {
+    prog_aslr = 0;
+  }
   prog_vma.base = prog_aslr; 
 
   // Load program into memory.
@@ -88,10 +83,13 @@ exec(char *path, char **argv)
   // Use the second as the user stack.
 
   // Compute stack aslr
-  r = random();
-  stack_aslr = PGROUNDDOWN(r);
-  // stack_aslr = 0x1000;
-  stack_vma.base = prog_vma.base + PGROUNDUP(sz) + stack_aslr; 
+  if(p->aslr){
+    r = random();
+    stack_aslr = PGROUNDDOWN(r);
+  } else {
+    stack_aslr = 0;
+  }
+  stack_vma.base = prog_vma.base + PGROUNDUP(prog_vma.sz) + stack_aslr; 
 
   // Setup stack
   if((sz = uvmalloc(pagetable, 0, 2*PGSIZE, stack_vma.base)) == 0)
@@ -145,15 +143,32 @@ exec(char *path, char **argv)
   p->tf->sp = sp; // initial stack pointer
 
   // Compute heap aslr
-  r = random();
-  heap_aslr = PGROUNDDOWN(r);
-  heap_vma.base = stack_vma.base + 2*PGSIZE + heap_aslr;
+  if(p->aslr){
+    r = random();
+    heap_aslr = PGROUNDDOWN(r);
+  } else {
+    heap_aslr = 0;
+  }
+  heap_vma.base = stack_vma.base + PGROUNDUP(stack_vma.sz) + heap_aslr;
   heap_vma.sz = 0;
   heap_vma.flags |= VMA_VALID;
 
-  p->vmas[HEAP_VMA_IDX] = heap_vma; 
-  p->vmas[PROG_VMA_IDX] = prog_vma;
-  p->vmas[STACK_VMA_IDX] = stack_vma;
+  if(p->aslr){
+    p->vmas[HEAP_VMA_IDX] = heap_vma; 
+    p->vmas[PROG_VMA_IDX] = prog_vma;
+    p->vmas[STACK_VMA_IDX] = stack_vma;
+    printf("ASLR on. Info:\n"); 
+    printf("Heap base: %p\n", heap_vma.base);
+    printf("Prog base: %p\n", prog_vma.base);
+    printf("Stack base: %p\n", stack_vma.base);
+  } else {
+    // For just 1 vma, use the heap. 
+    heap_vma.sz = heap_vma.base;
+    heap_vma.base = 0;
+    p->vmas[HEAP_VMA_IDX] = heap_vma; 
+    p->vmas[PROG_VMA_IDX].flags &= ~VMA_VALID;
+    p->vmas[STACK_VMA_IDX].flags &= ~VMA_VALID;
+  }
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
  bad:

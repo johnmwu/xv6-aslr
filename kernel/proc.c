@@ -212,11 +212,12 @@ userinit(void)
   
   // allocate one user page and copy init's instructions
   // and data into it.
-  // for now, now aslr in the init process
+  // for now, no aslr in the init process
   uvminit(p->pagetable, initcode, sizeof(initcode));
-  p->vmas[0].flags |= VMA_VALID;
-  p->vmas[0].base = 0;
-  p->vmas[0].sz = PGSIZE;
+  p->vmas[HEAP_VMA_IDX].flags |= VMA_VALID;
+  p->vmas[HEAP_VMA_IDX].base = 0;
+  p->vmas[HEAP_VMA_IDX].sz = PGSIZE;
+  p->aslr = 1; // on by default
 
   // prepare for the very first "return" from kernel to user.
   p->tf->epc = 0;      // user program counter
@@ -279,6 +280,7 @@ fork(void)
       }
     }
   }
+  np->aslr = p->aslr;
 
   np->parent = p;
 
