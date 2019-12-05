@@ -133,7 +133,6 @@ exec(char *path, char **argv)
   // Commit to the user image.
   // oldpagetable = p->pagetable;
   p->pagetable = pagetable;
-  p->sz = sz;
   p->tf->epc = elf.entry + prog_aslr;  // initial program counter = main
   p->tf->sp = sp; // initial stack pointer
 

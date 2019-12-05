@@ -138,7 +138,6 @@ freeproc(struct proc *p)
   if(p->pagetable)
     proc_freepagetable(p);
   p->pagetable = 0;
-  p->sz = 0;
   p->pid = 0;
   p->parent = 0;
   p->name[0] = 0;
@@ -214,10 +213,9 @@ userinit(void)
   // and data into it.
   // for now, now aslr in the init process
   uvminit(p->pagetable, initcode, sizeof(initcode));
-  p->sz = PGSIZE;
   p->vmas[0].flags |= VMA_VALID;
   p->vmas[0].base = 0;
-  p->vmas[0].sz = 0x1000;
+  p->vmas[0].sz = PGSIZE;
 
   // prepare for the very first "return" from kernel to user.
   p->tf->epc = 0;      // user program counter
@@ -280,7 +278,6 @@ fork(void)
       }
     }
   }
-  np->sz = p->sz;
 
   np->parent = p;
 
