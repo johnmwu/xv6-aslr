@@ -20,11 +20,9 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pagetable_t pagetable = 0;
   struct proc *p = myproc();
-  struct vma prog_vma;
+  struct vma prog_vma, stack_vma;
 
-  
-  // int do_aslr;
-  uint64 prog_aslr; 
+  uint64 prog_aslr, stack_aslr; 
 
   begin_op(ROOTDEV);
 
@@ -53,10 +51,10 @@ exec(char *path, char **argv)
   if((pagetable = proc_pagetable(p)) == 0)
     goto bad;
 
-  // Compute address space randomizations
+  // Compute prog aslr
   r = random();
-  prog_aslr = PGROUNDDOWN(r);
-  // prog_aslr = 0x0000;
+  // prog_aslr = PGROUNDDOWN(r);
+  prog_aslr = 0x1000; 
   prog_vma.base = prog_aslr; 
 
   // Load program into memory.
@@ -80,19 +78,32 @@ exec(char *path, char **argv)
   iunlockput(ip);
   end_op(ROOTDEV);
   ip = 0;
+  prog_vma.sz = sz;
+  prog_vma.flags |= VMA_VALID;
+
+  printf("got here 1\n");
 
   p = myproc();
   // uint64 oldsz = p->sz;
 
   // Allocate two pages at the next page boundary.
   // Use the second as the user stack.
-  sz = PGROUNDUP(sz);
-  if((sz = uvmalloc(pagetable, sz, sz + 2*PGSIZE, prog_aslr)) == 0)
+
+  // Compute stack aslr
+  r = random();
+  // stack_aslr = PGROUNDDOWN(r);
+  stack_aslr = 0x1000;
+  stack_vma.base = prog_vma.base + PGROUNDUP(sz) + stack_aslr; 
+
+  // Setup stack
+  if((sz = uvmalloc(pagetable, 0, 2*PGSIZE, stack_vma.base)) == 0)
     goto bad;
-  uvmclear(pagetable, sz-2*PGSIZE + prog_aslr);
-  sp = sz + prog_aslr;
+  uvmclear(pagetable, stack_vma.base);
+  sp = sz + stack_vma.base;
   stackbase = sp - PGSIZE;
-  prog_vma.sz = sz; 
+  stack_vma.sz = sz;
+  stack_vma.flags |= VMA_VALID;
+  printf("got here 2\n");
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
@@ -102,8 +113,10 @@ exec(char *path, char **argv)
     sp -= sp % 16; // riscv sp must be 16-byte aligned
     if(sp < stackbase)
       goto bad;
+    printf("got here 7\n");
     if(copyout(pagetable, sp, argv[argc], strlen(argv[argc]) + 1) < 0)
       goto bad;
+    printf("got here 8\n");
     ustack[argc] = sp;
   }
   ustack[argc] = 0;
@@ -113,8 +126,10 @@ exec(char *path, char **argv)
   sp -= sp % 16;
   if(sp < stackbase)
     goto bad;
+  printf("got here 6\n");
   if(copyout(pagetable, sp, (char *)ustack, (argc+1)*sizeof(uint64)) < 0)
     goto bad;
+  printf("got here 5\n");
 
   // arguments to user main(argc, argv)
   // argc is returned via the system call return
@@ -129,15 +144,18 @@ exec(char *path, char **argv)
     
   // Free up memory
   proc_freepagetable(p);
+  printf("got here 4\n");
 
   // Commit to the user image.
   // oldpagetable = p->pagetable;
   p->pagetable = pagetable;
-  p->tf->epc = elf.entry + prog_aslr;  // initial program counter = main
+  p->tf->epc = elf.entry + prog_vma.base;  // initial program counter = main
   p->tf->sp = sp; // initial stack pointer
 
-  prog_vma.flags |= VMA_VALID;
-  p->vmas[0] = prog_vma;
+  p->vmas[0].flags &= ~VMA_VALID; // to remove
+  p->vmas[PROG_VMA_IDX] = prog_vma;
+  p->vmas[STACK_VMA_IDX] = stack_vma;
+  printf("got here 3\n");
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
  bad:

@@ -183,9 +183,10 @@ proc_freepagetable(struct proc *p)
 
   for(vma_idx=0; vma_idx<NVMA; vma_idx++){
     if(p->vmas[vma_idx].flags & VMA_VALID){
-      uvmfree(p->pagetable, p->vmas[vma_idx].sz, p->vmas[vma_idx].base);
+      uvmunmap(p->pagetable, p->vmas[vma_idx].base, p->vmas[vma_idx].sz, 1);
     }
   }
+  freewalk(p->pagetable);
 }
 
 // a user program that calls exec("/init")
@@ -236,7 +237,7 @@ growproc(int n)
 {
   uint sz;
   struct proc *p = myproc();
-  struct vma *heap_vma = &p->vmas[0]; // to change
+  struct vma *heap_vma = &p->vmas[HEAP_VMA_IDX]; // to change
 
   sz = heap_vma->sz; 
   if(n > 0){

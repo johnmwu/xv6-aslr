@@ -274,7 +274,7 @@ uvmdealloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz, uint64 base)
 
 // Recursively free page-table pages.
 // All leaf mappings must already have been removed.
-static void
+void
 freewalk(pagetable_t pagetable)
 {
   // there are 2^9 = 512 PTEs in a page table.
