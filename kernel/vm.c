@@ -181,6 +181,9 @@ uvmunmap(pagetable_t pagetable, uint64 va, uint64 size, int do_free)
 
   a = PGROUNDDOWN(va);
   last = PGROUNDDOWN(va + size - 1);
+  if(last < a){
+    return;
+  }
   for(;;){
     if((pte = walk(pagetable, a, 0)) == 0)
       panic("uvmunmap: walk");

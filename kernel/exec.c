@@ -20,9 +20,9 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pagetable_t pagetable = 0;
   struct proc *p = myproc();
-  struct vma prog_vma, stack_vma;
+  struct vma prog_vma, stack_vma, heap_vma;
 
-  uint64 prog_aslr, stack_aslr; 
+  uint64 prog_aslr, stack_aslr, heap_aslr; 
 
   begin_op(ROOTDEV);
 
@@ -144,7 +144,14 @@ exec(char *path, char **argv)
   p->tf->epc = elf.entry + prog_vma.base;  // initial program counter = main
   p->tf->sp = sp; // initial stack pointer
 
-  p->vmas[0].flags &= ~VMA_VALID; // to remove
+  // Compute heap aslr
+  r = random();
+  heap_aslr = PGROUNDDOWN(r);
+  heap_vma.base = stack_vma.base + 2*PGSIZE + heap_aslr;
+  heap_vma.sz = 0;
+  heap_vma.flags |= VMA_VALID;
+
+  p->vmas[HEAP_VMA_IDX] = heap_vma; 
   p->vmas[PROG_VMA_IDX] = prog_vma;
   p->vmas[STACK_VMA_IDX] = stack_vma;
   return argc; // this ends up in a0, the first argument to main(argc, argv)
