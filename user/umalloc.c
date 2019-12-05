@@ -52,6 +52,7 @@ morecore(uint nu)
   if(nu < 4096)
     nu = 4096;
   p = sbrk(nu * sizeof(Header));
+  // printf("%p\n", p);
   if(p == (char*)-1)
     return 0;
   hp = (Header*)p;
@@ -83,8 +84,9 @@ malloc(uint nbytes)
       freep = prevp;
       return (void*)(p + 1);
     }
-    if(p == freep)
+    if(p == freep){
       if((p = morecore(nunits)) == 0)
         return 0;
+    }
   }
 }

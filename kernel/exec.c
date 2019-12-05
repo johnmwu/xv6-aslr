@@ -54,9 +54,9 @@ exec(char *path, char **argv)
     goto bad;
 
   // Compute address space randomizations
-  // prog_aslr = PGROUNDDOWN(random());
   r = random();
   prog_aslr = PGROUNDDOWN(r);
+  // prog_aslr = 0x0000;
   prog_vma.base = prog_aslr; 
 
   // Load program into memory.

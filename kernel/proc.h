@@ -84,6 +84,7 @@ enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 #define VMA_VALID 0x1
 #define NVMA 3
+#define HEAP_VMA_IDX 0
 
 struct vma {
   int flags; 

@@ -41,15 +41,21 @@ sys_wait(void)
 uint64
 sys_sbrk(void)
 {
-  int addr;
+  // int addr;
   int n;
+  struct proc *p;
+  uint64 base, sz;
 
   if(argint(0, &n) < 0)
     return -1;
-  addr = myproc()->sz;
+
+  p = myproc(); // get this info before growing
+  base = p->vmas[HEAP_VMA_IDX].base;
+  sz = p->vmas[HEAP_VMA_IDX].sz;
+
   if(growproc(n) < 0)
     return -1;
-  return addr;
+  return base + sz;
 }
 
 uint64
