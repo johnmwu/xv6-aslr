@@ -143,6 +143,7 @@ void            syscall();
 // trap.c
 extern uint     ticks;
 extern uint     old_ticks;
+extern uint64   prev_rand;
 extern uint     tick_dif;
 extern uint     intr_count;
 void            trapinit(void);

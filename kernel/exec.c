@@ -35,7 +35,11 @@ exec(char *path, char **argv)
   ilock(ip);
   uint64 r;
   r = random();
-  printf("random val: %d\n", r);
+  printf("random val: %p\n", r);
+  r = random();
+  printf("random val: %p\n", r);
+  r = random();
+  printf("random val: %p\n", r);
 
   //printf("old ticks: %d\n", old_ticks);
   //printf("tick dif: %d\n", tick_dif);
@@ -51,7 +55,8 @@ exec(char *path, char **argv)
 
   // Compute address space randomizations
   // prog_aslr = PGROUNDDOWN(random());
-  prog_aslr = 0x0000;
+  r = random();
+  prog_aslr = PGROUNDDOWN(r);
   prog_vma.base = prog_aslr; 
 
   // Load program into memory.

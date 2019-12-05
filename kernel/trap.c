@@ -10,6 +10,7 @@ struct spinlock tickslock;
 uint ticks;
 //struct spinlock ticksdlock;
 uint old_ticks;
+uint64 prev_rand; // different random val b/w consecutive calls
 uint tick_dif;
 uint intr_count;
 extern char trampoline[], uservec[], userret[];
