@@ -14,7 +14,7 @@ exec(char *path, char **argv)
 {
   char *s, *last;
   int i, off;
-  uint64 argc, sz, sp, ustack[MAXARG+1], stackbase;
+  uint64 argc, sp, ustack[MAXARG+1], stackbase;
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
@@ -48,10 +48,15 @@ exec(char *path, char **argv)
   } else {
     prog_aslr = 0;
   }
-  prog_vma.base = prog_aslr;
 
+  prog_vma.base = prog_aslr;
+  shadow_vma.base = 0;
+  prog_vma.flags |= VMA_VALID;
+  shadow_vma.flags |= VMA_VALID;
+  prog_vma.sz = 0;
+  shadow_vma.sz = 0;
+  printf("got here 1\n"); 
   // Load program into memory.
-  sz = 0;
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, 0, (uint64)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
@@ -62,9 +67,9 @@ exec(char *path, char **argv)
     if(ph.vaddr + ph.memsz < ph.vaddr)
       goto bad;
     if(p->aslr) // shadow program
-      if(uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, 0) == 0)
+      if((shadow_vma.sz = uvmalloc(pagetable, shadow_vma.sz, ph.vaddr + ph.memsz, 0)) == 0)
         goto bad;
-    if((sz = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, prog_aslr)) == 0)
+    if((prog_vma.sz = uvmalloc(pagetable, prog_vma.sz, ph.vaddr + ph.memsz, prog_aslr)) == 0)
       goto bad;
     if(ph.vaddr % PGSIZE != 0)
       goto bad;
@@ -77,14 +82,9 @@ exec(char *path, char **argv)
   iunlockput(ip);
   end_op(ROOTDEV);
   ip = 0;
-  prog_vma.sz = sz;
-  prog_vma.flags |= VMA_VALID;
 
   // Setup shadow
   if(p->aslr){
-    shadow_vma.base = 0;
-    shadow_vma.sz = sz;
-    shadow_vma.flags |= VMA_VALID;
     uvmnoexec(pagetable, shadow_vma.base, shadow_vma.sz);
   }
 
@@ -101,18 +101,20 @@ exec(char *path, char **argv)
   } else {
     stack_aslr = 0;
   }
-  stack_vma.base = prog_vma.base + PGROUNDUP(prog_vma.sz) + stack_aslr; 
 
+  printf("got here 2\n"); 
   // Setup stack
-  if((sz = uvmalloc(pagetable, 0, 2*PGSIZE, stack_vma.base)) == 0)
+  stack_vma.base = prog_vma.base + PGROUNDUP(prog_vma.sz) + stack_aslr; 
+  stack_vma.sz = 0;
+  stack_vma.flags |= VMA_VALID;
+  if((stack_vma.sz = uvmalloc(pagetable, 0, 2*PGSIZE, stack_vma.base)) == 0)
     goto bad;
   uvmclear(pagetable, stack_vma.base);
-  sp = sz + stack_vma.base;
+  sp = stack_vma.sz + stack_vma.base;
   stackbase = sp - PGSIZE;
-  stack_vma.sz = sz;
-  stack_vma.flags |= VMA_VALID;
 
   // Push argument strings, prepare rest of stack in ustack.
+  printf("got here 3\n"); 
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
@@ -125,6 +127,7 @@ exec(char *path, char **argv)
     ustack[argc] = sp;
   }
   ustack[argc] = 0;
+  printf("got here 4\n"); 
 
   // push the array of argv[] pointers.
   sp -= (argc+1) * sizeof(uint64);
@@ -186,8 +189,20 @@ exec(char *path, char **argv)
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
  bad:
-  if(pagetable)
-    proc_freepagetable(p); // TODO
+  if(pagetable){
+    uvmunmap(pagetable, TRAMPOLINE, PGSIZE, 0);
+    uvmunmap(pagetable, TRAPFRAME, PGSIZE, 0);
+
+    if(prog_vma.flags & VMA_VALID){
+      uvmunmap(pagetable, prog_vma.base, prog_vma.sz, 1);
+    }
+    if(shadow_vma.flags & VMA_VALID){
+      uvmunmap(pagetable, shadow_vma.base, shadow_vma.sz, 1);
+    }
+    if(stack_vma.flags & VMA_VALID){
+      uvmunmap(pagetable, stack_vma.base, stack_vma.sz, 1);
+    }
+  }
   if(ip){
     iunlockput(ip);
     end_op(ROOTDEV);
