@@ -242,13 +242,11 @@ growproc(int n)
 
   sz = heap_vma->sz; 
   if(n > 0){
-    if((sz = uvmalloc(p->pagetable, sz, sz + n, heap_vma->base)) == 0) {
+    if((sz = uvmalloc(p->pagetable, sz, sz + n, heap_vma->base)) == -1) {
       return -1;
     }
   } else if(n < 0){
-    if((sz = uvmdealloc(p->pagetable, sz, sz + n, heap_vma->base)) == 0) {
-      return -1;
-    }
+    sz = uvmdealloc(p->pagetable, sz, sz + n, heap_vma->base);
   }
   heap_vma->sz = sz;
   return 0;

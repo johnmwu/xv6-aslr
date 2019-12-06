@@ -196,9 +196,11 @@ exec(char *path, char **argv)
     if(prog_vma.flags & VMA_VALID){
       uvmunmap(pagetable, prog_vma.base, prog_vma.sz, 1);
     }
+    printf("got here 5\n"); 
     if(shadow_vma.flags & VMA_VALID){
       uvmunmap(pagetable, shadow_vma.base, shadow_vma.sz, 1);
     }
+    printf("got here 6\n"); 
     if(stack_vma.flags & VMA_VALID){
       uvmunmap(pagetable, stack_vma.base, stack_vma.sz, 1);
     }

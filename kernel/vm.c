@@ -181,7 +181,7 @@ uvmunmap(pagetable_t pagetable, uint64 va, uint64 size, int do_free)
 
   a = PGROUNDDOWN(va);
   last = PGROUNDDOWN(va + size - 1);
-  if(last < a){
+  if(last+PGSIZE < a+PGSIZE){
     return;
   }
   for(;;){
@@ -250,13 +250,13 @@ uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz, uint64 base)
     mem = kalloc();
     if(mem == 0){
       uvmdealloc(pagetable, a - base, oldsz, base);
-      return 0;
+      return -1;
     }
     memset(mem, 0, PGSIZE);
     if(mappages(pagetable, a, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
       kfree(mem);
       uvmdealloc(pagetable, a - base, oldsz, base);
-      return 0;
+      return -1;
     }
   }
   return newsz;

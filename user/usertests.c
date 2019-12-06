@@ -1673,6 +1673,9 @@ sbrktest(void)
 
   a = sbrk(0);
   c = sbrk(-(sbrk(0) - oldbrk));
+  printf("%p\n", oldbrk);
+  printf("%p\n", a);
+  printf("%p\n", c);
   if(c != a){
     printf("sbrk downsize failed, a %x c %x\n", a, c);
     exit(1);
@@ -1960,20 +1963,20 @@ main(int argc, char *argv[])
   }
   close(open("usertests.ran", O_CREATE));
 
-  reparent();
-  twochildren();
-  forkfork();
-  forkforkfork();
+  /* reparent(); */
+  /* twochildren(); */
+  /* forkfork(); */
+  /* forkforkfork(); */
   
-  argptest();
-  createdelete();
-  linkunlink();
-  concreate();
-  fourfiles();
-  sharedfd();
+  /* argptest(); */
+  /* createdelete(); */
+  /* linkunlink(); */
+  /* concreate(); */
+  /* fourfiles(); */
+  /* sharedfd(); */
 
-  bigargtest();
-  bigwrite();
+  /* bigargtest(); */
+  /* bigwrite(); */
   bigargtest();
   bsstest();
   sbrktest();
@@ -1982,7 +1985,7 @@ main(int argc, char *argv[])
   
   opentest();
   writetest();
-  writetest1();
+  //writetest1();
   createtest();
 
   openiputtest();
