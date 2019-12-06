@@ -55,7 +55,6 @@ exec(char *path, char **argv)
   shadow_vma.flags |= VMA_VALID;
   prog_vma.sz = 0;
   shadow_vma.sz = 0;
-  printf("got here 1\n"); 
   // Load program into memory.
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, 0, (uint64)&ph, off, sizeof(ph)) != sizeof(ph))
@@ -102,7 +101,6 @@ exec(char *path, char **argv)
     stack_aslr = 0;
   }
 
-  printf("got here 2\n"); 
   // Setup stack
   stack_vma.base = prog_vma.base + PGROUNDUP(prog_vma.sz) + stack_aslr; 
   stack_vma.sz = 0;
@@ -114,7 +112,6 @@ exec(char *path, char **argv)
   stackbase = sp - PGSIZE;
 
   // Push argument strings, prepare rest of stack in ustack.
-  printf("got here 3\n"); 
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
@@ -127,7 +124,6 @@ exec(char *path, char **argv)
     ustack[argc] = sp;
   }
   ustack[argc] = 0;
-  printf("got here 4\n"); 
 
   // push the array of argv[] pointers.
   sp -= (argc+1) * sizeof(uint64);

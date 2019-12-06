@@ -120,6 +120,7 @@ sh()
     exit(0);
   }
   else {
+    wait(0);
     exit(0);
   }
   return -1;

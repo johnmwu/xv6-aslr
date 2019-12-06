@@ -1963,20 +1963,20 @@ main(int argc, char *argv[])
   }
   close(open("usertests.ran", O_CREATE));
 
-  /* reparent(); */
-  /* twochildren(); */
-  /* forkfork(); */
-  /* forkforkfork(); */
+  reparent();
+  twochildren();
+  forkfork();
+  forkforkfork();
   
-  /* argptest(); */
-  /* createdelete(); */
-  /* linkunlink(); */
-  /* concreate(); */
-  /* fourfiles(); */
-  /* sharedfd(); */
+  argptest();
+  createdelete();
+  linkunlink();
+  concreate();
+  fourfiles();
+  sharedfd();
 
-  /* bigargtest(); */
-  /* bigwrite(); */
+  bigargtest();
+  bigwrite();
   bigargtest();
   bsstest();
   sbrktest();
@@ -1985,7 +1985,7 @@ main(int argc, char *argv[])
   
   opentest();
   writetest();
-  //writetest1();
+  writetest1();
   createtest();
 
   openiputtest();
@@ -1999,7 +1999,7 @@ main(int argc, char *argv[])
 
   rmdot();
   fourteen();
-  //bigfile();
+  bigfile();
   subdir();
   linktest();
   unlinkread();
