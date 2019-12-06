@@ -21,17 +21,8 @@ extern uint64 random(void){
   ticksc = ticks;
   wakeup(&ticks);
   release(&tickslock);
-  // printf("ticksc is: %d\n", ticksc);
-  // printf("old_ticks is %d\n", old_ticks);
-  // printf("intr_count is %d\n", intr_count);
   uint val = (ticksc - old_ticks) + intr_count + prev_rand;
   uint square = (val) * (val);
-  // printf("val is : %d\n", val);
- 
-  
-  //uint64 square =  (uint64)((ticksc - old_ticks) + intr_count) * (uint64)((ticksc - old_ticks) + intr_count);
-  // printf("square is: %d\n", square);
-  //printf("final value: %d\n", square % 1000000000);
   uint hashed = hash(square);
   uint64 mod = 0x1000000;
   prev_rand = (uint64)hashed % mod;
