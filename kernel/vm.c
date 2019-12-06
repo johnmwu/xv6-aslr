@@ -355,6 +355,21 @@ uvmclear(pagetable_t pagetable, uint64 va)
   *pte &= ~PTE_U;
 }
 
+void
+uvmnoexec(pagetable_t pagetable, uint64 base, uint64 sz)
+{
+  pte_t *pte;
+  uint64 va;
+  
+  for(va=base; va<base+sz; va+=PGSIZE){
+    pte = walk(pagetable, va, 0);
+    if(pte == 0)
+      panic("uvmnoexec");
+    *pte &= ~PTE_X;
+  }
+}
+
+
 // Copy from kernel to user.
 // Copy len bytes from src to virtual address dstva in a given page table.
 // Return 0 on success, -1 on error.

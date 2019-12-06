@@ -20,7 +20,7 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pagetable_t pagetable = 0;
   struct proc *p = myproc();
-  struct vma prog_vma, stack_vma, heap_vma;
+  struct vma prog_vma, stack_vma, heap_vma, shadow_vma;
   uint64 prog_aslr, stack_aslr, heap_aslr, r; 
 
   begin_op(ROOTDEV);
@@ -31,8 +31,6 @@ exec(char *path, char **argv)
   }
   ilock(ip);
 
-  //printf("old ticks: %d\n", old_ticks);
-  //printf("tick dif: %d\n", tick_dif);
   // Check ELF header
   if(readi(ip, 0, (uint64)&elf, 0, sizeof(elf)) != sizeof(elf))
     goto bad;
@@ -45,12 +43,12 @@ exec(char *path, char **argv)
 
   // Compute prog aslr
   if(p->aslr){
-    r = random();
+    r = random() + 0x100000; // make sure doesn't conflict w/ shadow vma
     prog_aslr = PGROUNDDOWN(r);
   } else {
     prog_aslr = 0;
   }
-  prog_vma.base = prog_aslr; 
+  prog_vma.base = prog_aslr;
 
   // Load program into memory.
   sz = 0;
@@ -63,10 +61,16 @@ exec(char *path, char **argv)
       goto bad;
     if(ph.vaddr + ph.memsz < ph.vaddr)
       goto bad;
+    if(p->aslr) // shadow program
+      if(uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, 0) == 0)
+        goto bad;
     if((sz = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz, prog_aslr)) == 0)
       goto bad;
     if(ph.vaddr % PGSIZE != 0)
       goto bad;
+    if(p->aslr) // shadow program
+      if(loadseg(pagetable, ph.vaddr, ip, ph.off, ph.filesz) < 0)
+        goto bad;
     if(loadseg(pagetable, ph.vaddr + prog_aslr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
@@ -75,6 +79,14 @@ exec(char *path, char **argv)
   ip = 0;
   prog_vma.sz = sz;
   prog_vma.flags |= VMA_VALID;
+
+  // Setup shadow
+  if(p->aslr){
+    shadow_vma.base = 0;
+    shadow_vma.sz = sz;
+    shadow_vma.flags |= VMA_VALID;
+    uvmnoexec(pagetable, shadow_vma.base, shadow_vma.sz);
+  }
 
   p = myproc();
   // uint64 oldsz = p->sz;
@@ -157,6 +169,7 @@ exec(char *path, char **argv)
     p->vmas[HEAP_VMA_IDX] = heap_vma; 
     p->vmas[PROG_VMA_IDX] = prog_vma;
     p->vmas[STACK_VMA_IDX] = stack_vma;
+    p->vmas[SHADOW_VMA_IDX] = shadow_vma;
     printf("ASLR on. Info:\n"); 
     printf("Heap base: %p\n", heap_vma.base);
     printf("Prog base: %p\n", prog_vma.base);
@@ -168,6 +181,7 @@ exec(char *path, char **argv)
     p->vmas[HEAP_VMA_IDX] = heap_vma; 
     p->vmas[PROG_VMA_IDX].flags &= ~VMA_VALID;
     p->vmas[STACK_VMA_IDX].flags &= ~VMA_VALID;
+    p->vmas[SHADOW_VMA_IDX].flags &= ~VMA_VALID;
   }
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
