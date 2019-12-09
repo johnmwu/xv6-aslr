@@ -7,12 +7,11 @@
 #include "defs.h"
 
 struct spinlock tickslock;
-uint ticks;
-//struct spinlock ticksdlock;
-uint old_ticks;
+uint64 ticks;
+uint64 old_ticks;
 uint64 prev_rand; // different random val b/w consecutive calls
-uint tick_dif;
-uint intr_count;
+uint64 tick_dif;
+uint64 intr_count;
 extern char trampoline[], uservec[], userret[];
 
 // in kernelvec.S, calls kerneltrap().

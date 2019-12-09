@@ -249,6 +249,9 @@ growproc(int n)
     sz = uvmdealloc(p->pagetable, sz, sz + n, heap_vma->base);
   }
   heap_vma->sz = sz;
+
+  // vmprint(p->pagetable);
+
   return 0;
 }
 

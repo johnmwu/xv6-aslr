@@ -13,3 +13,4 @@
 #define MAXPATH      128   // maximum file path name
 #define NDISK        2
 #define MAXHEAP      (64*1024) // heap size
+#define ASLR_MOD     (1L << 36)

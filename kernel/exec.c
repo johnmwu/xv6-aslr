@@ -44,6 +44,7 @@ exec(char *path, char **argv)
   // Compute prog aslr
   if(p->aslr){
     r = random() + 0x100000; // make sure doesn't conflict w/ shadow vma
+    r %= ASLR_MOD;
     prog_aslr = PGROUNDDOWN(r);
   } else {
     prog_aslr = 0;
@@ -96,6 +97,7 @@ exec(char *path, char **argv)
   // Compute stack aslr
   if(p->aslr){
     r = random();
+    r %= ASLR_MOD;
     stack_aslr = PGROUNDDOWN(r);
   } else {
     stack_aslr = 0;
@@ -147,9 +149,6 @@ exec(char *path, char **argv)
   // Free up memory
   proc_freepagetable(p);
 
-  // Print page table
-  vmprint(pagetable);
-
   // Commit to the user image.
   // oldpagetable = p->pagetable;
   p->pagetable = pagetable;
@@ -161,6 +160,7 @@ exec(char *path, char **argv)
   // Compute heap aslr
   if(p->aslr){
     r = random();
+    r %= ASLR_MOD;
     heap_aslr = PGROUNDDOWN(r);
   } else {
     heap_aslr = 0;
@@ -174,10 +174,6 @@ exec(char *path, char **argv)
     p->vmas[PROG_VMA_IDX] = prog_vma;
     p->vmas[STACK_VMA_IDX] = stack_vma;
     p->vmas[SHADOW_VMA_IDX] = shadow_vma;
-    printf("ASLR on. Info:\n"); 
-    printf("Heap base: %p\n", heap_vma.base);
-    printf("Prog base: %p\n", prog_vma.base);
-    printf("Stack base: %p\n", stack_vma.base);
   } else {
     // For just 1 vma, use the heap. 
     heap_vma.sz = heap_vma.base;
@@ -187,6 +183,13 @@ exec(char *path, char **argv)
     p->vmas[STACK_VMA_IDX].flags &= ~VMA_VALID;
     p->vmas[SHADOW_VMA_IDX].flags &= ~VMA_VALID;
   }
+  // print
+  // vmprint(pagetable);
+  // printf("ASLR on. Info:\n"); 
+  // printf("Heap base: %p\n", heap_vma.base);
+  // printf("Prog base: %p\n", prog_vma.base);
+  // printf("Stack base: %p\n", stack_vma.base);
+
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
  bad:

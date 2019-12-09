@@ -141,11 +141,11 @@ int             fetchaddr(uint64, uint64*);
 void            syscall();
 
 // trap.c
-extern uint     ticks;
-extern uint     old_ticks;
+extern uint64   ticks;
+extern uint64   old_ticks;
 extern uint64   prev_rand;
-extern uint     tick_dif;
-extern uint     intr_count;
+extern uint64   tick_dif;
+extern uint64   intr_count;
 void            trapinit(void);
 void            trapinithart(void);
 extern struct spinlock tickslock;
