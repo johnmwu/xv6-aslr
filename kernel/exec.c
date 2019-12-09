@@ -147,11 +147,16 @@ exec(char *path, char **argv)
   // Free up memory
   proc_freepagetable(p);
 
+  // Print page table
+  vmprint(pagetable);
+
   // Commit to the user image.
   // oldpagetable = p->pagetable;
   p->pagetable = pagetable;
   p->tf->epc = elf.entry + prog_vma.base;  // initial program counter = main
   p->tf->sp = sp; // initial stack pointer
+  // printf("epc: %p\n", p->tf->epc);
+  // printf("sp: %p\n", p->tf->sp);
 
   // Compute heap aslr
   if(p->aslr){
@@ -192,11 +197,9 @@ exec(char *path, char **argv)
     if(prog_vma.flags & VMA_VALID){
       uvmunmap(pagetable, prog_vma.base, prog_vma.sz, 1);
     }
-    printf("got here 5\n"); 
     if(shadow_vma.flags & VMA_VALID){
       uvmunmap(pagetable, shadow_vma.base, shadow_vma.sz, 1);
     }
-    printf("got here 6\n"); 
     if(stack_vma.flags & VMA_VALID){
       uvmunmap(pagetable, stack_vma.base, stack_vma.sz, 1);
     }

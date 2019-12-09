@@ -15,6 +15,38 @@ extern char etext[];  // kernel.ld sets this to end of kernel code.
 
 extern char trampoline[]; // trampoline.S
 
+static void
+ptprint(pagetable_t pagetable, int ndots)
+{
+  for(int i=0; i<512; i++){
+    pte_t pte = pagetable[i];
+
+    if(!(pte & PTE_V))
+      continue;
+
+    // print page table line
+    for(int j=0; j<ndots; j++)
+      printf(" ..");
+    printf("%d: pte %p pa %p\n", i, pte, PTE2PA(pte));
+
+    // recurse?
+    if((pte & (PTE_R|PTE_W|PTE_X)) == 0){
+      uint64 child = PTE2PA(pte);
+      ptprint((pagetable_t)child, ndots+1);
+    }
+  }
+}
+
+void
+vmprint(pagetable_t pagetable)
+{
+  // First line of output
+  printf("page table %p\n", pagetable);
+  
+  ptprint(pagetable, 1);
+}
+
+
 /*
  * create a direct-map page table for the kernel and
  * turn on paging. called early, in supervisor mode.
@@ -379,7 +411,7 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
   uint64 n, va0, pa0;
 
   while(len > 0){
-    va0 = (uint)PGROUNDDOWN(dstva);
+    va0 = PGROUNDDOWN(dstva);
     pa0 = walkaddr(pagetable, va0);
     if(pa0 == 0)
       return -1;
@@ -404,7 +436,7 @@ copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len)
   uint64 n, va0, pa0;
 
   while(len > 0){
-    va0 = (uint)PGROUNDDOWN(srcva);
+    va0 = PGROUNDDOWN(srcva);
     pa0 = walkaddr(pagetable, va0);
     if(pa0 == 0)
       return -1;
@@ -431,7 +463,7 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   int got_null = 0;
 
   while(got_null == 0 && max > 0){
-    va0 = (uint)PGROUNDDOWN(srcva);
+    va0 = PGROUNDDOWN(srcva);
     pa0 = walkaddr(pagetable, va0);
     if(pa0 == 0)
       return -1;

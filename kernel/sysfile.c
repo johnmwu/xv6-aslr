@@ -440,6 +440,7 @@ sys_exec(void)
   
   
   int ret = exec(path, argv);
+  // printf("ret val: %d\n", ret);
   acquire(&tickslock);
   //printf("ticks is: %d\n", ticks);
   //printf("old_ticks is: %d\n", old_ticks);

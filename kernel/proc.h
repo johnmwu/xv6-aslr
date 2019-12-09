@@ -92,7 +92,7 @@ enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 struct vma {
   int flags; 
   uint64 base;
-  int sz;
+  uint64 sz;
 };
 
 // Per-process state

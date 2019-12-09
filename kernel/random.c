@@ -24,7 +24,7 @@ extern uint64 random(void){
   uint val = (ticksc - old_ticks) + intr_count + prev_rand;
   uint square = (val) * (val);
   uint hashed = hash(square);
-  uint64 mod = 0x1000000;
+  uint64 mod = 0x100000000;
   prev_rand = (uint64)hashed % mod;
   return prev_rand;
 }
